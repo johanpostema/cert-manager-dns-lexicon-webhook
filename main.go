@@ -28,6 +28,7 @@ type lexiconCommandOptions struct {
 	authToken   string
 	command     []string
 	usePassword bool
+	Endpoint    string
 }
 type DNSLexiconDnsRecord struct {
 	RecordType string `json:"type"`
@@ -82,6 +83,11 @@ func lexiconCmd(cmd lexiconCommandOptions) (bool, error) {
 		"--auth-username", cmd.authUser,
 		pwParam, cmd.authToken,
 	}
+
+	if cmd.Endpoint != "" {
+		cmdArgs = append(cmdArgs, "--endpoint", cmd.Endpoint)
+	}
+
 	var err error
 	cmdArgs = append(cmdArgs, cmd.command...)
 	cmdArgs = append(cmdArgs,
@@ -182,6 +188,7 @@ type DNSLexiconDNSProviderConfig struct {
 	TTL          *int                                `json:"ttl"`
 	Sandbox      bool                                `json:"sandbox"`
 	UsePassword  bool                                `json:"usePassword"`
+	Endpoint     string 				 `json:"endpoint"`
 	//Secrets directly in config - not recomended -> use secrets!
 	APIKey    string `json:"apiKey"`
 	APISecret string `json:"apiSecret"`
@@ -220,6 +227,7 @@ func (c *DNSLexiconDNSProviderSolver) Present(ch *v1alpha1.ChallengeRequest) err
 		authToken:   cfg.APISecret,
 		Provider:    cfg.Provider,
 		usePassword: cfg.UsePassword,
+		Endpoint:    cfg.Endpoint,
 		command: []string{
 			"create",
 			ch.ResolvedZone,
@@ -259,6 +267,7 @@ func (c *DNSLexiconDNSProviderSolver) CleanUp(ch *v1alpha1.ChallengeRequest) err
 		authToken:   cfg.APISecret,
 		Provider:    cfg.Provider,
 		usePassword: cfg.UsePassword,
+		Endpoint:    cfg.Endpoint,
 		command: []string{
 			"delete",
 			ch.ResolvedZone,
